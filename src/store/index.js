@@ -41,6 +41,9 @@ export default createStore({
     },
   },
   actions: {
+    setUser({ commit }, user) {
+      commit('setUser', user);
+    },
     async login({ commit, dispatch }, form) {
       try {
         const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/login`, form);

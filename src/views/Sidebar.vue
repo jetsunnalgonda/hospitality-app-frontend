@@ -8,7 +8,7 @@
       <router-link v-if="isCollapsed" to="/"><font-awesome-icon icon="home" class="icon" /></router-link>
     </div>
     <div class="profile-section" v-if="!isCollapsed">
-      <img :src="profilePicUrl || '/default-avatar.jpg'" alt="Profile Picture" />
+      <a href="#" @click="gotoProfile"><img :src="profilePicUrl || '/default-avatar.jpg'" alt="Profile Picture" /></a>
       <div class="profile-name">{{ userName }}</div>
     </div>
     <font-awesome-icon v-if="isCollapsed" icon="user-circle" class="profile-icon" />
@@ -93,7 +93,10 @@ export default {
     async performLogout() {
       this.logout();
       this.$router.push('/login');
-    }
+    },
+    gotoProfile() {
+      this.$router.push('/profile');
+    },
   },
 };
 </script>
