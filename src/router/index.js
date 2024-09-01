@@ -18,8 +18,21 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('token'); // Check if token is stored
+  
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Redirect to login if route requires auth and user is not authenticated
+    next('/login');
+  } else if (to.path === '/register' && isAuthenticated) {
+    // Redirect to home or another page if user is already authenticated and trying to access register
+    next('/'); // Redirect to home or any other page you prefer
+  } else {
+    next();
+  }
+});
 export default router;

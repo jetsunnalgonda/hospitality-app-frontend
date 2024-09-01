@@ -2,7 +2,7 @@
   <div class="dashboard">
     <div class="dashboard-header">
       <h1>Hospital Dashboard</h1>
-      <p>Welcome, Dr. Smith. Here's an overview of the current status.</p>
+      <p>Welcome, {{ userName }}. Here's an overview of the current status.</p>
     </div>
 
     <div class="stats-overview">
@@ -46,6 +46,7 @@
 
 <script>
 import { Chart, registerables } from 'chart.js';
+import { mapGetters } from 'vuex';
 
 // Register all components
 Chart.register(...registerables);
@@ -61,6 +62,18 @@ export default {
       apiBaseUrl: process.env.VUE_APP_API_BASE_URL,
       // profilePicUrl: this.defaultAvatarUrl,
     };
+  },
+  computed: {
+    ...mapGetters(['user']),
+
+    userName() {
+      console.log('userName change triggered');
+      console.log('userName is', this.user?.name);
+      console.log('user avatar is', this.user?.avatars)
+      console.log('imageKey: ' + this.user?.avatars?.[0]?.url)
+      return this.user?.name || 'Guest';
+    },
+
   },
   mounted() {
     const ctx = document.getElementById('admissionsChart').getContext('2d');

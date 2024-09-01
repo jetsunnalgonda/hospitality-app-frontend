@@ -8,34 +8,92 @@
       <router-link v-if="isCollapsed" to="/"><font-awesome-icon icon="home" class="icon" /></router-link>
     </div>
     <div class="profile-section" v-if="!isCollapsed">
-      <img src="default-avatar.jpg" alt="Profile Picture" />
-      <div class="profile-name">John Doe</div>
+      <img :src="profilePicUrl || '/default-avatar.jpg'" alt="Profile Picture" />
+      <div class="profile-name">{{ userName }}</div>
     </div>
     <font-awesome-icon v-if="isCollapsed" icon="user-circle" class="profile-icon" />
 
     <ul class="nav-links">
-      <li><router-link to="/scripts"><font-awesome-icon icon="file-alt" class="icon" /> <span v-if="!isCollapsed">Scripts</span></router-link></li>
-      <li><router-link to="/schedule"><font-awesome-icon icon="calendar-alt" class="icon" /> <span v-if="!isCollapsed">Schedule</span></router-link></li>
-      <li><router-link to="/tasks"><font-awesome-icon icon="tasks" class="icon" /> <span v-if="!isCollapsed">Tasks</span></router-link></li>
-      <li><router-link to="/appointments"><font-awesome-icon icon="calendar-check" class="icon" /> <span v-if="!isCollapsed">Appointments</span></router-link></li>
-      <li><router-link to="/logout"><font-awesome-icon icon="sign-out-alt" class="icon" /> <span v-if="!isCollapsed">Logout</span></router-link></li>
+      <li><router-link to="/scripts"><font-awesome-icon icon="file-alt" class="icon" /> <span
+            v-if="!isCollapsed">Scripts</span></router-link></li>
+      <li><router-link to="/schedule"><font-awesome-icon icon="calendar-alt" class="icon" /> <span
+            v-if="!isCollapsed">Schedule</span></router-link></li>
+      <li><router-link to="/tasks"><font-awesome-icon icon="tasks" class="icon" /> <span
+            v-if="!isCollapsed">Tasks</span></router-link></li>
+      <li><router-link to="/appointments"><font-awesome-icon icon="calendar-check" class="icon" /> <span
+            v-if="!isCollapsed">Appointments</span></router-link></li>
+      <li><a @click="performLogout"><font-awesome-icon icon="sign-out-alt" class="icon" /> <span
+            v-if="!isCollapsed">Logout</span></a></li>
     </ul>
 
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
+import { getPresignedUrl } from '../utils/apiService';
+
 export default {
   name: 'SidebarView',
   data() {
     return {
-      isCollapsed: false, // Track whether the sidebar is collapsed
+      isLoading: false,
+      isCollapsed: false,
+      // user: null,
+      defaultAvatarUrl: '/default-avatar.jpg', // Default avatar image URL
+      apiBaseUrl: process.env.VUE_APP_API_BASE_URL,
+      // profilePicUrl: this.defaultAvatarUrl,
     };
+  },
+  computed: {
+    ...mapGetters(['user', 'isAuthenticated']),
+
+    userName() {
+      console.log('userName change triggered');
+      console.log('userName is', this.user?.name);
+      console.log('user avatar is', this.user?.avatars)
+      console.log('imageKey: ' + this.user?.avatars?.[0]?.url)
+      return this.user?.name || 'Guest';
+    },
+
+  },
+  asyncComputed: {
+    profilePicUrl: {
+      async get() {
+        this.isLoading = true;
+        let presignedUrl = this.defaultAvatarUrl
+        if (this.isAuthenticated) {
+          presignedUrl = await getPresignedUrl(this.user?.avatars?.[0]?.url)
+        }
+        return presignedUrl
+      },
+      default() {
+        return this.defaultAvatarUrl
+      }
+    }
   },
   methods: {
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
     },
+    ...mapActions(['logout']),
+    async updateProfilePicUrl(user) {
+      if (user && user.avatars && user.avatars.length > 0) {
+        const avatarUrl = user.avatars[0].url;
+        try {
+          this.profilePicUrl = await getPresignedUrl(avatarUrl);
+        } catch (error) {
+          this.profilePicUrl = this.defaultAvatarUrl;
+        }
+      } else {
+        this.profilePicUrl = this.defaultAvatarUrl;
+      }
+    },
+    async performLogout() {
+      this.logout();
+      this.$router.push('/login');
+    }
   },
 };
 </script>

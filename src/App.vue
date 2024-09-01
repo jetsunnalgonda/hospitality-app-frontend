@@ -1,32 +1,46 @@
 <template>
   <div id="app">
-    <Sidebar />
-    <router-view class="content" />
-  </div>
+    <Sidebar v-if="isAuthenticated" />
+    <!-- <router-view :class="['content', { 'content-centered': !isAuthenticated }]" /> -->
+    <router-view :class="['content', { 'content-centered': !isAuthenticated }]" />
+</div>
 </template>
 
 <script>
 import Sidebar from './views/Sidebar.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'App',
   components: {
     Sidebar,
   },
+  computed: {
+    ...mapGetters(['isAuthenticated']), // Map Vuex getters to computed properties
+  },
 };
 </script>
 
 <style>
-/* #app {
-  display: flex;
-}
-
+/* Base styles for the content area */
 .content {
-  margin-left: 250px;
   padding: 20px;
   background-color: #ecf0f1;
   height: 100vh;
-  width: 100%; 
-  overflow-y: auto; 
-} */
+  overflow-y: auto;
+  transition: margin-left 0.3s ease;
+}
+
+/* Margin-left for content when the sidebar is shown */
+.content {
+  margin-left: 200px; /* This matches the sidebar width */
+}
+
+/* Centered content when not authenticated (sidebar not shown) */
+.content-centered {
+  margin-left: 0;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 800px; /* Optional: max width to better control centering */
+}
 </style>

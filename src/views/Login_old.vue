@@ -1,14 +1,14 @@
 <template>
-  <div class="login-container loading-overlay-container">
+  <div class="login-container">
     <h2>Login</h2>
-    <form @submit.prevent="handleLogin">
+    <form @submit.prevent="login">
       <div class="form-group">
         <label for="email">Email:</label>
-        <input type="email" v-model="form.email" id="email" required />
+        <input type="email" v-model="email" id="email" required />
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" v-model="form.password" id="password" required />
+        <input type="password" v-model="password" id="password" required />
       </div>
       <button type="submit">Login</button>
     </form>
@@ -19,80 +19,49 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import LoadingOverlay from '../utils/LoadingOverlay';
-import '../utils/LoadingOverlay.css';
+import axios from 'axios';
 
 export default {
   name: 'LoginView',
   data() {
     return {
-      form: {
-        email: '',
-        password: '',
-      },
-      apiBaseUrl: process.env.VUE_APP_API_BASE_URL,
+      email: '',
+      password: '',
     };
   },
   methods: {
-    showOverlay() {
-      if (this.loadingOverlay) {
-        this.loadingOverlay.close(); // Close any existing instance
-      }
-      this.loadingOverlay = new LoadingOverlay({
-        text: 'Logging in...',
-        color: '#1b62e1',
-        spinnerType: 'lds-roller'
-      });
-      this.loadingOverlay.init('loading-overlay-container'); // Attach to element with class 'loading-overlay-container'
-    },
-    hideOverlay() {
-      if (this.loadingOverlay) {
-        this.loadingOverlay.close();
-        this.loadingOverlay = null; // Clear reference
-      }
-    },
-    async handleLogin() {
-      this.isLoading = true;
-      this.showOverlay();
-
-      console.log('Form data before dispatch:', this.form);
-
+    async login() {
       try {
-        const result = await this.login(this.form);
-        if (result.success) {
-          this.$router.push('/'); // Redirect to home or another protected route
-        } else {
-          this.errorMessage = result.message;
-        }
-      } catch (error) {
-        this.errorMessage = 'An error occurred during login.';
-      } finally {
-        this.isLoading = false;
-        this.hideOverlay();
-      }
+        const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/api/login`, {
+          email: this.email,
+          password: this.password,
+        });
 
+        const { token, refreshToken } = response.data;
+
+        // Store tokens in local storage or cookies
+        localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
+
+        // Redirect to dashboard or home page
+        this.$router.push('/');
+      } catch (error) {
+        console.error('Login failed:', error.response ? error.response.data.message : error.message);
+        alert('Login failed. Please check your credentials.');
+      }
     },
     goToRegister() {
       this.$router.push('/register');
     },
-    ...mapActions(['login']),
-
   },
 };
 </script>
 
 <style scoped>
-.disabled {
-  pointer-events: none;
-}
-.error-message {
-  color: red;
-}
 /* Form Container */
 .login-container {
   max-width: 400px;
-  margin: 0px auto;
+  margin: 100px auto;
   padding: 20px;
   background-color: #ffffff;
   border-radius: 12px;
@@ -175,7 +144,6 @@ button:hover {
   color: #5da6f0;
   text-decoration: none;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .register-link a:hover {
