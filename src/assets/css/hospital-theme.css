@@ -1,0 +1,511 @@
+/* General Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Manrope', sans-serif;
+    background-color: #f8faff;
+    color: #333;
+    line-height: 1.6;
+    font-size: 12px; /* Smaller font size */
+  }
+  
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  /* Sidebar Styles */
+  .sidebar {
+    background-color: #d4e4f7; /* Light blue for the sidebar */
+    color: #333;
+    width: 200px; /* Narrower sidebar */
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    border-right: 1px solid #b0c8e4;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    transition: width 0.3s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.collapsed {
+    width: 60px; /* Width when collapsed */
+  }
+
+  .toggle-button {
+    position: absolute;
+    top: 15px;
+    right: -15px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    color: #3a5ba0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+
+  .sidebar-header {
+    text-align: center;
+    padding: 10px;
+    font-size: 1.1em; /* Smaller font size */
+    color: #2c3e50;
+  }
+  
+  .sidebar-header a {
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+  
+  /* Profile Section in Sidebar */
+  .profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #b0c8e4;
+    margin-bottom: 15px;
+  }
+  
+  .profile-section img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .profile-section .profile-name {
+    font-size: 1em; /* Smaller font size */
+    color: #2c3e50;
+    font-weight: bold;
+    border-bottom: 1px solid #2e4a8f;
+  }
+  
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 10px 0; /* Less padding */
+  }
+  
+  .nav-links li {
+    padding: 10px 15px; /* Less padding */
+    margin: 5px 0;
+    /* background-color: #b0c8e4; */
+    background-color: #b0c8e4;
+    border-radius: 20px; /* Increased roundness */
+    transition: all 0.3s ease;
+  }
+
+  .nav-links li .icon {
+    margin-right: 10px;
+    font-size: 1.2em; /* Adjust icon size */
+    color: inherit; /* Ensure icon color matches text color */
+  }
+  
+  .nav-links li a {
+    display: block;
+    font-size: 1em; /* Smaller font size */
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  .nav-links li a span {
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar.collapsed .nav-links li a span {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+  }
+  
+  .nav-links li:hover {
+    background-color: #98b8de;
+  }
+  
+  .nav-links li.active {
+    background-color: #2c3e50;
+  }
+  
+  .nav-links li.active a {
+    color: #fff;
+  }
+  
+  /* Main Content Styles */
+  .content {
+    margin-left: 200px; /* Adjust content margin for narrower sidebar */
+    padding: 20px; /* Less padding */
+    background-color: #f8faff;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+  }
+
+  .sidebar.collapsed + .content {
+    margin-left: 60px;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    margin-bottom: 20px;
+    /* display: flex; */
+    justify-content: space-between;
+    text-align: center;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 1.4em; /* Smaller font size */
+    color: #2c3e50;
+    /* text-transform: uppercase; */
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .dashboard-header p {
+    font-size: 0.9em; /* Smaller font size */
+    color: #777;
+  }
+  
+  /* Stats Overview Section */
+  .stats-overview {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Less margin */
+  }
+  
+  .stat-card {
+    background-color: #eef2f7;
+    padding: 15px; /* Less padding */
+    border-radius: 12px; /* Increased roundness */
+    width: 22%;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .stat-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-card h2 {
+    font-size: 1.1em; /* Smaller font size */
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  .stat-card p {
+    font-size: 1.8em; /* Smaller font size */
+    color: #5da6f0;
+  }
+  
+  /* Chart Overview Section */
+  .charts-overview {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .chart-card {
+    background-color: #eef2f7;
+    padding: 15px; /* Less padding */
+    border-radius: 12px; /* Increased roundness */
+    width: 48%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-card h3 {
+    font-size: 1.1em; /* Smaller font size */
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+  
+  .chart-placeholder {
+    background-color: #d1d9e6;
+    height: 220px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-size: 1em;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    max-height: 300px;
+    height: 100%; /* Fill the height of the parent container */
+    display: flex; /* Ensure it uses flexbox to manage the height of its child */
+    align-items: center; /* Center content vertically if needed */
+    justify-content: center; /* Center content horizontally if needed */
+  }
+  
+  /* Buttons */
+  button {
+    background-color: #5da6f0;
+    color: #fff;
+    padding: 8px 15px; /* Thinner buttons */
+    border: none;
+    border-radius: 20px; /* Increased roundness */
+    cursor: pointer;
+    font-size: 0.9em; /* Smaller font size */
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  
+  button:hover {
+    background-color: #4a92da;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Form Container */
+  .register-container {
+    max-width: 400px;
+    margin: 0px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Inputs */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  textarea {
+    width: 100%;
+    padding: 10px 15px; /* Less padding */
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #b0c8e4;
+    border-radius: 8px; /* Increased roundness */
+    background-color: #fff;
+    color: #333;
+    font-size: 0.9em; /* Smaller font size */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #5da6f0;
+    box-shadow: 0 0 5px rgba(93, 166, 240, 0.5);
+  }
+  
+  /* Forms */
+  form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 15px; /* Less padding */
+    background-color: #eef2f7;
+    border-radius: 12px; /* Increased roundness */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    font-size: 1.0em;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  
+  /* Cards */
+  .card {
+    background-color: #fff;
+    padding: 15px; /* Less padding */
+    border-radius: 12px; /* Increased roundness */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .card h2 {
+    font-size: 1.2em; /* Smaller font size */
+    margin-bottom: 10px;
+    color: #2c3e50;
+  }
+  
+  .card p {
+    font-size: 0.9em; /* Smaller font size */
+  }
+  
+  /* Table Styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  th, td {
+    padding: 10px; /* Less padding */
+    text-align: left;
+    border-bottom: 1px solid #b0c8e4;
+  }
+  
+  th {
+    background-color: #eef2f7;
+    color: #2c3e50;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.9em; /* Smaller font size */
+  }
+  
+  td {
+    background-color: #fff;
+    color: #333;
+  }
+  
+  tr:hover {
+    background-color: #f1f5fb;
+  }
+  
+  /* Scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #eef2f7;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #b0c8e4;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #98b8de;
+  }
+  
+  /* Miscellaneous Enhancements */
+  .card, .chart-card, .stat-card {
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover, .chart-card:hover, .stat-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* Mobile Styles */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 180px; /* Narrower sidebar for mobile */
+    }
+  
+    .content {
+      margin-left: 180px; /* Adjust content margin for narrower sidebar */
+      padding: 15px; /* Less padding */
+    }
+  
+    .dashboard-header h1 {
+      font-size: 1.3em; /* Smaller font for mobile */
+    }
+  
+    .dashboard-header p {
+      font-size: 0.8em; /* Smaller font for mobile */
+    }
+  
+    .stats-overview {
+      flex-direction: column; /* Stack stats cards vertically on mobile */
+      gap: 20px;
+    }
+  
+    .stat-card {
+      width: 100%; /* Full width for stats cards on mobile */
+      padding: 12px; /* Less padding for mobile */
+    }
+  
+    .charts-overview {
+      flex-direction: column; /* Stack charts vertically on mobile */
+      gap: 20px;
+    }
+  
+    .chart-card {
+      width: 100%; /* Full width for chart cards on mobile */
+    }
+  
+    button {
+      width: 100%; /* Full width buttons on mobile */
+      font-size: 0.8em; /* Smaller font for mobile */
+      padding: 8px; /* Less padding for mobile */
+    }
+  
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      font-size: 0.8em; /* Smaller font for mobile */
+    }
+  
+    .nav-links li {
+      padding: 8px 12px; /* Adjust padding for smaller screen */
+    }
+  
+    .sidebar-header {
+      font-size: 1em; /* Slightly smaller header on mobile */
+    }
+  
+    table {
+      font-size: 0.8em; /* Smaller table text for mobile */
+    }
+  
+    th, td {
+      padding: 8px; /* Adjust padding for table cells on mobile */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .sidebar {
+      width: 160px; /* Even narrower sidebar for very small screens */
+    }
+  
+    .content {
+      margin-left: 160px; /* Adjust content margin for narrower sidebar */
+      padding: 10px; /* Further reduce padding for very small screens */
+    }
+  
+    .dashboard-header h1 {
+      font-size: 1.2em; /* Smaller font for very small screens */
+    }
+  
+    .dashboard-header p {
+      font-size: 0.7em; /* Smaller font for very small screens */
+    }
+  
+    .stat-card p {
+      font-size: 1.3em; /* Smaller stats text for very small screens */
+    }
+  
+    button {
+      font-size: 0.7em; /* Smaller buttons for very small screens */
+    }
+  
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      font-size: 0.7em; /* Smaller font for input fields on very small screens */
+    }
+  }
+  
