@@ -277,6 +277,10 @@ export default {
       // Redirect to login or another page
       // if (error.response && error.response.status === 401) {
       // Only redirect if it's an authentication issue
+
+      console.log('There is a fucking error')
+      return;
+
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       this.setUser(null); // Clear Vuex user state
