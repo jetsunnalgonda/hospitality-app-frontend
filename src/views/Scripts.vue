@@ -7,6 +7,7 @@
       <ul>
         <li v-for="script in scripts" :key="script.id">
           <div class="script-title">{{ script.title }}</div>
+          <div class="script-content">{{ script.content }}</div>
           <button @click="editScript(script)">Edit</button>
           <button @click="deleteScript(script.id)">Delete</button>
         </li>
@@ -48,6 +49,7 @@ export default {
       try {
         const response = await apiClient.get('/scripts');
         this.scripts = response.data;
+        console.log(response.data)
       } catch (error) {
         console.error('Error fetching scripts:', error);
       }
