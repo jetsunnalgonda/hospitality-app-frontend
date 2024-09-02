@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import apiClient from '@/utils/apiClient'; // Adjust the path as needed
+import axios from 'axios';
 
 export default {
   name: 'ScriptsView',
@@ -44,9 +44,15 @@ export default {
     this.fetchScripts();
   },
   methods: {
+    // Function to get the token from localStorage
+    getToken() {
+      return localStorage.getItem('token');
+    },
     async fetchScripts() {
       try {
-        const response = await apiClient.get('/scripts');
+        const response = await axios.get(`${process.env.VUE_APP_API_BASE_URL}/scripts`, {
+          headers: { Authorization: `Bearer ${this.getToken()}` }
+        });
         this.scripts = response.data;
       } catch (error) {
         console.error('Error fetching scripts:', error);
@@ -56,10 +62,14 @@ export default {
       try {
         if (this.currentScript.id) {
           // Update existing script
-          await apiClient.put(`/scripts/${this.currentScript.id}`, this.currentScript);
+          await axios.put(`${process.env.VUE_APP_API_BASE_URL}/scripts/${this.currentScript.id}`, this.currentScript, {
+            headers: { Authorization: `Bearer ${this.getToken()}` }
+          });
         } else {
           // Create new script
-          await apiClient.post('/scripts', this.currentScript);
+          await axios.post(`${process.env.VUE_APP_API_BASE_URL}/scripts`, this.currentScript, {
+            headers: { Authorization: `Bearer ${this.getToken()}` }
+          });
         }
         this.resetForm();
         this.fetchScripts();
@@ -72,7 +82,9 @@ export default {
     },
     async deleteScript(scriptId) {
       try {
-        await apiClient.delete(`/scripts/${scriptId}`);
+        await axios.delete(`${process.env.VUE_APP_API_BASE_URL}/scripts/${scriptId}`, {
+          headers: { Authorization: `Bearer ${this.getToken()}` }
+        });
         this.fetchScripts();
       } catch (error) {
         console.error('Error deleting script:', error);
