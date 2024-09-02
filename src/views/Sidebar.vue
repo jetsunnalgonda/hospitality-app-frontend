@@ -8,7 +8,7 @@
       <router-link v-if="isCollapsed" to="/"><font-awesome-icon icon="home" class="icon" /></router-link>
     </div>
     <div class="profile-section" v-if="!isCollapsed">
-      <a href="#" @click="gotoProfile"><img :src="profilePicUrl || '/default-avatar.jpg'" alt="Profile Picture" /></a>
+      <a href="" @click="gotoProfile"><img :src="profilePicUrl || '/default-avatar.jpg'" alt="Profile Picture" /></a>
       <div class="profile-name">{{ userName }}</div>
     </div>
     <font-awesome-icon v-if="isCollapsed" icon="user-circle" class="profile-icon" />
