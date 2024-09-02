@@ -282,7 +282,7 @@ export default {
       this.setUser(null); // Clear Vuex user state
       this.setAuthenticated(false); // Update the authentication state
 
-      this.router.push('/login');
+      this.$router.push('/login');
       // } else {
       //     console.error('Server error:', error);
       //     // Handle other types of errors accordingly
