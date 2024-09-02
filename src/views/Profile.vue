@@ -33,10 +33,10 @@
         <label for="confirmPassword">Confirm Password:</label>
         <input type="password" v-model="form.confirmPassword" id="confirmPassword" />
       </div>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="avatar">Profile Picture:</label>
         <input type="file" id="avatar" @change="handleFileUpload" />
-      </div>
+      </div> -->
       <button type="submit">Update Profile</button>
     </form>
   </div>
@@ -72,7 +72,7 @@ export default {
       temporaryAvatarUrl: '',
       apiBaseUrl: process.env.VUE_APP_API_BASE_URL,
       profilePicUrl: '/default-avatar.jpg',
-      roles: ['Admin', 'Coordinator', 'Doctor'], 
+      roles: ['Admin', 'Coordinator', 'Doctor'],
     };
   },
   mounted() {
@@ -211,16 +211,21 @@ export default {
       this.showOverlay();
       try {
         const formData = { ...this.form };
+        console.log('formData = ' + formData);
         console.log(formData.avatars);
         formData.avatars = formData.avatars.map((avatar) => ({
           id: avatar.id,
           url: avatar.url || undefined
         }));
 
-        // Append new password if provided
-        if (this.form.newPassword) {
-          formData.append('password', this.form.newPassword);
+        // Only add the password field if a new password is provided
+        if (this.form.newPassword === undefined) {
+          delete formData.newPassword;
+          delete formData.confirmPassword;
+        } else {
+          console.log('newPassword = ' + this.form.newPassword);
         }
+        console.log('formData = ' + formData);
 
         // Append avatar if new one is selected
         if (this.temporaryAvatar) {
