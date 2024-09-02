@@ -5,6 +5,7 @@ import store from './store';
 import AsyncComputed from 'vue-async-computed'
 
 import '@/assets/css/hospital-theme.css'; // Import the theme
+import '@/assets/css/messages-jetsun.css';
 
 // FontAwesome imports
 import { library } from '@fortawesome/fontawesome-svg-core';

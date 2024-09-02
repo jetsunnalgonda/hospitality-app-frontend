@@ -22,6 +22,8 @@
             v-if="!isCollapsed">Tasks</span></router-link></li>
       <li><router-link to="/appointments"><font-awesome-icon icon="calendar-check" class="icon" /> <span
             v-if="!isCollapsed">Appointments</span></router-link></li>
+      <li><router-link to="/messages"><font-awesome-icon icon="envelope" class="icon" /> <span 
+            v-if="!isCollapsed">Messages</span></router-link></li>
       <li><a @click="performLogout"><font-awesome-icon icon="sign-out-alt" class="icon" /> <span
             v-if="!isCollapsed">Logout</span></a></li>
     </ul>

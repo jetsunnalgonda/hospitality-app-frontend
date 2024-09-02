@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
 import { getPresignedUrl } from '../utils/apiService';
 import apiClient from '@/utils/apiClient';
 
@@ -143,10 +143,12 @@ export default {
       // }
     },
     async getUserProfile() {
-      const url = `${this.apiBaseUrl}/profile`;
-      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-      console.log(`Requesting user profile from: ${url}`);
-      return axios.get(url, { headers });
+      const response = await apiClient.get('/profile');
+      return response;
+      // const url = `${this.apiBaseUrl}/profile`;
+      // const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      // console.log(`Requesting user profile from: ${url}`);
+      // return axios.get(url, { headers });
     },
     async loadAvatarUrls() {
       console.log('Loading avatar URLs...');
