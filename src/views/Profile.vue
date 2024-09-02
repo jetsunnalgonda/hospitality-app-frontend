@@ -279,14 +279,13 @@ export default {
       // Only redirect if it's an authentication issue
 
       console.log('There is a fucking error')
-      return;
 
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      this.setUser(null); // Clear Vuex user state
-      this.setAuthenticated(false); // Update the authentication state
+      // localStorage.removeItem('user');
+      // localStorage.removeItem('token');
+      // this.setUser(null); // Clear Vuex user state
+      // this.setAuthenticated(false); // Update the authentication state
 
-      this.$router.push('/login');
+      // this.$router.push('/login');
       // } else {
       //     console.error('Server error:', error);
       //     // Handle other types of errors accordingly
