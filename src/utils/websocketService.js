@@ -124,7 +124,7 @@ class WebSocketService {
   }
 
   // Send a message through WebSocket with retry mechanism
-  sendMessage(action, data) {
+  sendMessage(action, data, userId) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({ action, data });
       this.ws.send(message);
@@ -143,7 +143,7 @@ class WebSocketService {
       setTimeout(() => {
         this.createWebSocket(userId);
         if (this.ws.readyState === WebSocket.OPEN) {
-          this.sendMessage(action, data);  // Resend message after reconnection
+          this.sendMessage(action, data, userId);  // Resend message after reconnection
         }
       }, this.reconnectDelay);
     } else {
