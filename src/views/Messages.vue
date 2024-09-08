@@ -85,28 +85,28 @@ export default {
       searchQuery: '',
     };
   },
-  watch: {
-    conversations(newVal, oldVal) {
-      // Ensure this runs after the DOM is updated
-      console.log('Conversations changed')
-      console.log(oldVal)
-      console.log(newVal)
-      nextTick(() => {
-        console.log('Next tick')
-        this.scrollToBottom();
-      });
-    },
-    selectedConversation(newVal, oldVal) {
-      // Ensure this runs after the DOM is updated
-      console.log('selectedConversation changed')
-      console.log(oldVal)
-      console.log(newVal)
-      nextTick(() => {
-        console.log('Next tick')
-        this.scrollToBottom();
-      });
-    },
-  },
+  // watch: {
+  //   conversations(newVal, oldVal) {
+  //     // Ensure this runs after the DOM is updated
+  //     console.log('Conversations changed')
+  //     console.log(oldVal)
+  //     console.log(newVal)
+  //     nextTick(() => {
+  //       console.log('Next tick')
+  //       this.scrollToBottom();
+  //     });
+  //   },
+  //   selectedConversation(newVal, oldVal) {
+  //     // Ensure this runs after the DOM is updated
+  //     console.log('selectedConversation changed')
+  //     console.log(oldVal)
+  //     console.log(newVal)
+  //     nextTick(() => {
+  //       console.log('Next tick')
+  //       this.scrollToBottom();
+  //     });
+  //   },
+  // },
   computed: {
     ...mapGetters('user', ['user']),
     filteredConversations() {

@@ -4,6 +4,8 @@ class WebSocketService {
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 2000;
+    this.heartbeatInterval = null;  // Interval for sending heartbeats
+    this.heartbeatTimeout = 10000;  // 10 seconds
     this.listeners = {};  // Listeners for different message types
   }
 
@@ -24,22 +26,46 @@ class WebSocketService {
     this.ws.onopen = () => {
       console.log('WebSocket connection opened');
       this.reconnectAttempts = 0;  // Reset reconnect attempts on successful connection
+      this.startHeartbeat();  // Start sending heartbeats
     };
 
     this.ws.onmessage = (event) => {
       console.log('WebSocket message received: ' + event.data);
       const parsedMessage = JSON.parse(event.data);
-      this.handleMessage(parsedMessage);  // Handle message using listeners
+      this.handleMessage(parsedMessage);
     };
 
     this.ws.onclose = () => {
       console.log('WebSocket connection closed');
+      this.stopHeartbeat();  // Stop sending heartbeats
       this.handleReconnect(userId);  // Attempt to reconnect
     };
 
     this.ws.onerror = (error) => {
       console.error('WebSocket error:', error);
+      this.ws.close();  // Close connection on error
     };
+  }
+
+  // Send a heartbeat (ping) to keep the connection alive
+  startHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+    this.heartbeatInterval = setInterval(() => {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.send(JSON.stringify({ action: 'ping' }));
+        console.log('Sent heartbeat (ping) to server');
+      }
+    }, this.heartbeatTimeout);
+  }
+
+  // Stop sending heartbeats
+  stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
   }
 
   // Handle reconnect attempts
@@ -53,7 +79,7 @@ class WebSocketService {
     }
   }
 
-  // Add a listener for a specific message type
+  // Add listener for a specific message type
   addListener(messageType, callback) {
     if (!this.listeners[messageType]) {
       this.listeners[messageType] = [];
@@ -67,7 +93,6 @@ class WebSocketService {
       this.listeners[messageType] = this.listeners[messageType].filter(cb => cb !== callback);
     }
   }
-
   // Handle incoming messages and dispatch them to listeners
   // handleMessage(message) {
   //   const { action, data } = message;
@@ -80,15 +105,15 @@ class WebSocketService {
   //   }
   // }
 
-  // In your WebSocketService class
-
+  // Handle incoming messages
   handleMessage(message) {
     const { action, data } = message;
 
-    // if (action === 'NEW_CONVERSATION') {
-    //   // Assuming you have a store or state management
-    //   store.commit('addConversation', data);
-    // }
+    // Example: handling 'pong' message from server as a response to 'ping'
+    if (action === 'pong') {
+      console.log('Received pong from server');
+      return;  // Ignore pong messages for other parts of the app
+    }
 
     // Existing message handling
     if (this.listeners[action]) {
@@ -97,17 +122,6 @@ class WebSocketService {
       console.warn('No listeners for message type:', action);
     }
   }
-
-  // Send a message through WebSocket
-  // sendMessage(action, data) {
-  //   if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-  //     const message = JSON.stringify({ action, data });
-  //     this.ws.send(message);
-  //     console.log('Sent WebSocket message:', message);
-  //   } else {
-  //     console.error('WebSocket connection is not open');
-  //   }
-  // }
 
   // Send a message through WebSocket with retry mechanism
   sendMessage(action, data, userId) {
@@ -129,7 +143,7 @@ class WebSocketService {
       setTimeout(() => {
         this.createWebSocket(userId);
         if (this.ws.readyState === WebSocket.OPEN) {
-          this.sendMessage(action, data,);  // Resend message after reconnection
+          this.sendMessage(action, data, userId);  // Resend message after reconnection
         }
       }, this.reconnectDelay);
     } else {
