@@ -36,27 +36,20 @@
         <h3>{{ selectedConversation.name }} <span class="tag">{{ selectedConversation.role }}</span></h3>
       </div>
 
-      <div class="chat-window" v-if="selectedConversation">
+      <div class="chat-window" v-if="selectedConversation" >
         <div class="messages" ref="chatContainer">
-          <transition-group name="message-list" tag="div">
-            <div v-for="(messageGroup, index) in groupedMessages" :key="index">
-              <div class="date-stamp">{{ messageGroup.date }}</div>
-
-              <transition-group name="message" tag="div">
-                <div v-for="message in messageGroup.messages" :key="message.id"
-                  :class="{ 'message': !message.isMine, 'my-message': message.isMine }">
-                  <img v-if="!message.isMine" :src="selectedConversation.avatarUrl" alt="User Avatar"
-                    class="message-avatar" />
-                  <div class="message-bubble">
-                    <p>{{ message.text }}</p>
-                    <span class="timestamp">{{ message.timestamp }}</span>
-                  </div>
-                </div>
-              </transition-group>
-
+          <div v-for="(messageGroup, index) in groupedMessages" :key="index">
+            <div class="date-stamp">{{ messageGroup.date }}</div>
+            <div v-for="message in messageGroup.messages" :key="message.id"
+              :class="{ 'message': !message.isMine, 'my-message': message.isMine }">
+              <img v-if="!message.isMine" :src="selectedConversation.avatarUrl" alt="User Avatar"
+                class="message-avatar" />
+              <div class="message-bubble">
+                <p>{{ message.text }}</p>
+                <span class="timestamp">{{ message.timestamp }}</span>
+              </div>
             </div>
-          </transition-group>
-
+          </div>
         </div>
 
         <div class="message-input">
@@ -77,7 +70,7 @@ import apiClient from '@/utils/apiClient';
 import websocketService from '@/utils/websocketService';
 import ActionQueue from '@/utils/ActionQueue';
 import { mapGetters, mapActions } from 'vuex';
-// import { nextTick } from 'vue';
+import { nextTick } from 'vue';
 
 export default {
   name: 'MessagesView',
@@ -242,11 +235,9 @@ export default {
     },
     async startConversationWithUser(user) {
       // Check if a conversation with this user already exists
-      const existingConversation = this.conversations.find(convo => {
-        const hasUser = convo.participants.some(participant => participant.id === user.id);
-        const hasCurrentUser = convo.participants.some(participant => participant.id === this.user.id);
-        return hasUser && hasCurrentUser;
-      });
+      const existingConversation = this.conversations.find(convo =>
+        convo.participants.includes(user.id) && convo.participants.includes(this.user.id)
+      );
 
       if (existingConversation) {
         this.selectConversation(existingConversation);
@@ -423,11 +414,10 @@ export default {
         });
 
         console.log('Parsed Messages:', this.selectedConversation.messages);
-        // nextTick(() => {
-        //   console.log('Next tick after fetching messages:')
-
-        // });
-        this.scrollToBottom('auto');
+        nextTick(() => {
+          console.log('Next tick after fetching messages:')
+          this.scrollToBottom();
+        });
 
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -469,24 +459,12 @@ export default {
       }
 
     },
-    // scrollToBottom() {
-    //   console.log('scrollToBottom triggered');
-    //   this.$nextTick(() => {
-    //     const chatContainer = this.$refs.chatContainer;
-    //     if (chatContainer) {
-    //       chatContainer.scrollTop = chatContainer.scrollHeight;
-    //     }
-    //   });
-    // },
-
-    scrollToBottom(behavior = 'smooth') {
+    scrollToBottom() {
       console.log('scrollToBottom triggered');
       this.$nextTick(() => {
-        if (this.$refs.chatContainer) {
-          this.$refs.chatContainer.scrollTo({
-            top: this.$refs.chatContainer.scrollHeight,
-            behavior: behavior
-          });
+        const chatContainer = this.$refs.chatContainer;
+        if (chatContainer) {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
         }
       });
     },
@@ -497,30 +475,6 @@ export default {
 
 <style scoped>
 /* Add your styles here */
-/* Message list animation */
-.message-list-enter-active,
-.message-list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.message-list-enter-from,
-.message-list-leave-to {
-  opacity: 1;
-  transform: translateY(20px);
-}
-
-/* Individual message animation */
-.message-enter-active,
-.message-leave-active {
-  transition: all 0.3s ease;
-}
-
-.message-enter-from,
-.message-leave-to {
-  opacity: 1;
-  transform: translateY(10px);
-}
-
 .search-bar {
   width: 100%;
   padding: 8px;

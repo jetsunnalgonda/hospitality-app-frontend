@@ -143,7 +143,7 @@ class WebSocketService {
       setTimeout(() => {
         this.createWebSocket(userId);
         if (this.ws.readyState === WebSocket.OPEN) {
-          this.sendMessage(action, data, userId);  // Resend message after reconnection
+          this.sendMessage(action, data,);  // Resend message after reconnection
         }
       }, this.reconnectDelay);
     } else {
