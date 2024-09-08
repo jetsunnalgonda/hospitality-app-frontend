@@ -49,7 +49,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['user', 'isAuthenticated']),
+    ...mapGetters('auth', ['isAuthenticated']),
+    ...mapGetters('user', ['user']),
 
     userName() {
       console.log('userName change triggered');
@@ -79,7 +80,7 @@ export default {
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
     },
-    ...mapActions(['logout']),
+    ...mapActions('auth', ['logout']),
     async updateProfilePicUrl(user) {
       if (user && user.avatars && user.avatars.length > 0) {
         const avatarUrl = user.avatars[0].url;

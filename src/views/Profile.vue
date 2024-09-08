@@ -80,7 +80,7 @@ export default {
     this.fetchUserData();
   },
   methods: {
-    ...mapActions(['setUser', 'setAuthenticated']),
+    ...mapActions('user', ['setUser', 'setAuthenticated']),
     // async loadUserProfile() {
     //   try {
     //     const response = await axios.get(`${this.apiBaseUrl}/profile`, {

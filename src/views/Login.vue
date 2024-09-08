@@ -76,7 +76,7 @@ export default {
     goToRegister() {
       this.$router.push('/register');
     },
-    ...mapActions(['login']),
+    ...mapActions('auth', ['login']),
 
   },
 };

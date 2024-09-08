@@ -26,7 +26,7 @@ apiClient.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/refresh`, { token: refreshToken });
+        const response = await apiClient.post(`/refresh`, { token: refreshToken });
 
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('refreshToken', response.data.refreshToken);
@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${response.data.token}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        await store.dispatch('logout');
+        await store.dispatch('auth/logout');
         router.push('/login');
         alert('Your session has expired. Please log in again.');
       }

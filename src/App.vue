@@ -16,7 +16,7 @@ export default {
     Sidebar,
   },
   computed: {
-    ...mapGetters(['isAuthenticated']), // Map Vuex getters to computed properties
+    ...mapGetters('auth', ['isAuthenticated']), // Map Vuex getters to computed properties
   },
 };
 </script>

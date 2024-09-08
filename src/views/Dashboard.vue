@@ -64,7 +64,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters('user', ['user']),
 
     userName() {
       console.log('userName change triggered');
