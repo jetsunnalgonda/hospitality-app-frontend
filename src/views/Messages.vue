@@ -9,11 +9,15 @@
           <li v-for="conversation in filteredConversations" :key="conversation.id"
             @click="selectConversation(conversation)">
             <div class="conversation-item" :class="{ 'selected': conversation.id === selectedConversation?.id }">
+              <!-- <div class="avatar-container"> -->
               <img :src="conversation.avatarUrl || '/default-avatar.jpg'" alt="User Avatar" class="avatar" />
+              <!-- </div> -->
               <div class="conversation-info">
                 <h4>{{ conversation.name }} <span class="tag">{{ conversation.role }}</span></h4>
                 <p>{{ conversation.lastMessage }}</p>
+                <span class="timestamp">{{ conversation.lastMessageTimestamp }}</span>
               </div>
+              <div v-if="conversation.unreadCount > 0" class="unread-count">{{ conversation.unreadCount }}</div>
             </div>
           </li>
         </template>
@@ -77,6 +81,7 @@ import apiClient from '@/utils/apiClient';
 import websocketService from '@/utils/websocketService';
 import ActionQueue from '@/utils/ActionQueue';
 import { mapGetters, mapActions } from 'vuex';
+import { getPresignedUrl } from '../utils/apiService';
 // import { nextTick } from 'vue';
 
 export default {
@@ -159,6 +164,7 @@ export default {
     this.fetchConversations();
     // this.getUserLocation();
     websocketService.initialize(this.user.id);
+    console.log('this.user.id is now ' + this.user.id)
     const existingListeners = websocketService.listeners.notification || [];
     console.log('existingListeners')
     console.log(existingListeners)
@@ -184,38 +190,52 @@ export default {
     },
     async fetchConversations() {
       try {
-        const response = await apiClient.get('/conversations');
+        // const response = await apiClient.get('/conversations');
 
-        // Example response data format:
-        // response.data = [
-        //   {
-        //     id: 1,
-        //     participants: [{ id: 1, name: 'John Doe', avatarUrl: '/john-avatar.jpg', role: 'admin' }],
-        //     lastMessage: 'Hello!',
-        //     lastMessageTimestamp: '2024-09-07T14:00:00.000Z'
-        //   },
-        //   ...
-        // ]
-
-        // Parse the response data to match the local conversation format
-        this.conversations = response.data.map(conversation => {
-          const lastMessage = conversation.lastMessage || ''; // Handle the case when there's no last message
-          const lastMessageTimestamp = new Date(conversation.lastMessageTimestamp).toLocaleString();
-
-          // Extract main participant (assumed first one that's not the current user)
-          const participant = conversation.participants.find(p => p.id !== this.user.id) || {};
-
-          return {
-            id: conversation.id,
-            name: participant.name || 'Unknown User', // Fallback for missing data
-            avatarUrl: participant.avatarUrl || '/default-avatar.jpg',
-            role: participant.role || 'user', // Role of the participant
-            lastMessage,
-            lastMessageTimestamp,
-            participants: conversation.participants,
-            messages: [], // Assuming you load messages later, you can initialize as empty
-          };
+        const response = await apiClient.post('/usersConversations', {
+          userId: this.user.id,
         });
+        console.log('this.user.id = ' + this.user.id);
+
+        console.log('conversations response.data:');
+        console.log(response.data);
+
+        // Use Promise.all to resolve all async operations within the map
+        this.conversations = await Promise.all(
+          response.data.map(async (conversation) => {
+            const lastMessage = conversation.messages[0]?.text || ''; // Handle case when there's no last message
+            const lastMessageTimestamp = new Date(conversation.messages[0]?.timestamp).toLocaleString();
+
+            console.log('conversation.messages:');
+            console.log(conversation.messages);
+            console.log('lastMessageTimestamp = ' + lastMessageTimestamp);
+
+            // Extract main participant (assumed first one that's not the current user)
+            const participant = conversation.participants.find(p => p.id !== this.user.id) || {};
+
+            // Fetch the presigned URL for the participant's avatar
+            const avatarUrl = participant.avatars?.[0]?.url
+              ? await getPresignedUrl(participant.avatars[0].url)
+              : '';
+
+            console.log('participant.avatars')
+            console.log(participant.avatars)
+            console.log('participant:')
+            console.log(participant)
+
+            return {
+              id: conversation.id,
+              name: participant.name || 'Unknown User', // Fallback for missing data
+              avatarUrl: avatarUrl,
+              role: participant.role || 'user', // Role of the participant
+              lastMessage,
+              lastMessageTimestamp,
+              participants: conversation.participants,
+              messages: [], // Assuming messages are loaded later
+              unreadCount: conversation.unreadCount,
+            };
+          })
+        );
 
         console.log('Parsed Conversations:', this.conversations);
       } catch (error) {
@@ -223,6 +243,16 @@ export default {
       }
     },
 
+    updateUnreadCount() {
+      const unreadMessages = document.querySelectorAll('.message.unread').length;
+      const unreadCountBadge = document.querySelector('.unread-count');
+
+      if (unreadMessages > 0) {
+        unreadCountBadge.textContent = unreadMessages;
+      } else {
+        unreadCountBadge.style.display = 'none'; // Hide if no unread messages
+      }
+    },
     selectConversation(conversation) {
       this.selectedConversation = conversation;
       console.log('Conversation selected:', this.selectedConversation)
@@ -240,14 +270,44 @@ export default {
         this.selectedConversation = null;
       }
     },
-    async startConversationWithUser(user) {
+    checkExistingConversationLocally_other(user) {
       // Check if a conversation with this user already exists
       const existingConversation = this.conversations.find(convo => {
         const hasUser = convo.participants.some(participant => participant.id === user.id);
         const hasCurrentUser = convo.participants.some(participant => participant.id === this.user.id);
         return hasUser && hasCurrentUser;
       });
+      return existingConversation;
+    },
+    checkExistingConversationLocally(user) {
+      return this.conversations.find(convo =>
+        convo.participants.some(p => p.id === user.id) &&
+        convo.participants.some(p => p.id === this.user.id)
+      );
+    },
+    async checkExistingConversationInDatabase(user1, user2) {
+      try {
+        const response = await apiClient.get('/conversations/check', {
+          params: {
+            user1Id: user1.id,
+            user2Id: user2.id
+          }
+        });
+        return response.data.conversation; // Assuming the conversation object is in `data.conversation`
+      } catch (error) {
+        console.error('Error checking conversation in the database:', error);
+        return null;
+      }
+    },
+    async startConversationWithUser(user) {
 
+      // Check locally first
+      let existingConversation = this.checkExistingConversationLocally(user);
+
+      if (!existingConversation) {
+        // If not found locally, check the database
+        existingConversation = await this.checkExistingConversationInDatabase(this.user, user);
+      }
       if (existingConversation) {
         this.selectConversation(existingConversation);
         return;
@@ -365,6 +425,7 @@ export default {
             conversationId: this.selectedConversation.id,
             text: newMessage.text,
             tempId: newMessage.id,
+            senderId: this.user.id,
             sendeeId: sendeeId, // Send sendeeId via WebSocket
             createdAt: timestamp,
           });
@@ -449,6 +510,8 @@ export default {
       const { tempId, text, createdAt } = message;
 
       console.log('incoming message:', message)
+      console.log('this.user.id =', this.user.id)
+
       const conversation = this.conversations.find(c => c.id === message.conversationId);
       if (conversation) {
         const existingMessage = conversation.messages.find(m => m.id === tempId);
@@ -544,10 +607,10 @@ export default {
 }
 
 
-.avatar {
+/* .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
-}
+} */
 </style>

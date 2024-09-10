@@ -56,6 +56,12 @@ export default {
       this.isLoading = true;
       this.showOverlay();
 
+      // const token = this.$store.getters['auth/accessToken'];
+
+      // await websocketService.sendMessage('LOGOUT_SESSIONS', {
+      //       logoutToken: this.accessToken // I don't know how to get the token
+      //     });
+
       console.log('Form data before dispatch:', this.form);
 
       try {

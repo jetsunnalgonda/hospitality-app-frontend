@@ -37,4 +37,11 @@ app.directive('click-outside', {
     }
 });
 
+window.addEventListener('storage', (event) => {
+    if (event.key === 'logout') {
+      store.dispatch('auth/logout'); // Ensure all tabs are logged out
+      window.location.href = '/login'; // Redirect to login page
+    }
+  });
+
 app.mount('#app');

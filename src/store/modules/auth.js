@@ -29,10 +29,14 @@ const mutations = {
       localStorage.removeItem('refreshToken');
     }
   },
+  logout_other_tabs() {
+    localStorage.setItem('logout', Date.now());
+  },
 };
 
 const actions = {
   async login({ commit, dispatch }, form) {
+    commit('logout_other_tabs');
     try {
       const response = await apiClient.post(`/login`, form);
       const { token, refreshToken } = response.data;
@@ -48,6 +52,7 @@ const actions = {
     }
   },
   async logout({ commit }) {
+    commit('logout_other_tabs');
     commit('logoutUser');
   },
   async refreshToken({ commit, state }) {
